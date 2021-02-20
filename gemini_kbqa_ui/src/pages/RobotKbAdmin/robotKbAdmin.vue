@@ -2,32 +2,12 @@
 <div class="CustomerKb">
   <el-container style="height: 700px; border: 1px solid #eee">
     <el-aside width="200px" style="background-color: rgb(238, 241, 246)">
-      <el-menu :default-openeds="['1', '3']" @select="select">
+      <el-menu :default-openeds="['1', '3']">
         <el-submenu index="1" style="background: rgb(24, 143, 255)">
-          <template slot="title"
-            ><i class="el-icon-message"></i>全部分类</template
-          >
-          <el-menu-item-group>
-            <el-menu-item index="tool">tool</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="机器人技术问题">机器人技术问题</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="机器人商务问题">机器人商务问题</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="公司通用问题">公司通用问题</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="客服云">客服云</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="用户情绪">用户情绪</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group>
-            <el-menu-item index="咨询">咨询</el-menu-item>
-          </el-menu-item-group>
+          <template slot="title">
+            <i class="el-icon-message"></i>全部分类</template>
+          <el-menu-item v-for="(item,i) in navList" :key="i" :index="item.categoryName" 
+            @click="getDataList(item.categoryId, pageNum, pageSize)">{{ item.categoryName }}</el-menu-item>
         </el-submenu>
         <el-menu-item index="2">管理分类</el-menu-item>
       </el-menu>
@@ -35,28 +15,60 @@
 
     <el-container>
       <el-main>
-        <el-button type="primary">新增知识规则</el-button>
-        <el-dropdown placement="bottom" trigger="click" @command="batchOperate">
-          <el-button type="primary">
-            导入/导出<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="batch_remarks">导入</el-dropdown-item>
-            <el-dropdown-item command="export_excel">导出</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-        <el-button type="primary">操作日志</el-button>
-        <el-dropdown placement="bottom" trigger="click" @command="batchOperate">
-          <el-button type="primary">
-            模板下载<i class="el-icon-arrow-down el-icon--right"></i>
-          </el-button>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item command="batch_remarks">导入</el-dropdown-item>
-            <el-dropdown-item command="export_excel">导出</el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+        <el-button type="primary" @click="dialogFormVisible = true">新增知识规则</el-button>
+        
+        <el-table :data="questionList">
+           <el-table-column prop="question" label="问题" width="140" align="center">
+          </el-table-column>
+          <el-table-column prop="answer" label="答案" width="120" align="center">
+          </el-table-column>
+          <el-table-column prop="useCount" label="使用次数" width="110" align="center">
+          </el-table-column>
+          <el-table-column prop="keyWordCount" label="关键词个数" width="180" align="center">
+          </el-table-column>
+          <el-table-column label="操作" align="center">
+            <template slot-scope="{row,$index}">
+              <el-button type="primary" size="mini">
+                编辑
+              </el-button>
+              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="deleteQuestion(row.id)">
+                删除
+              </el-button>
+          </template>
+          </el-table-column>
+        </el-table>
       </el-main>
     </el-container>
+    <el-dialog title="新增知识规则" :visible.sync="dialogFormVisible">
+      <el-form ref="addQuestionForm" :model="addQuestionForm">
+        <el-form-item label="标准问题" :label-width="formLabelWidth" prop="question">
+          <el-input type="text" v-model="addQuestionForm.question" autocomplete="off" style="width:500px"></el-input>
+        </el-form-item>
+        <el-form-item label="相似问题" :label-width="formLabelWidth" prop="similarityQestions[0]">
+          <el-input type="text" v-model="addQuestionForm.similarityQestions[0]" autocomplete="off" style="width:500px"></el-input>
+          <i class="el-icon-circle-plus-outline" style="font-size: 20px" @click="addSimiliartyQuestion()"></i>
+        </el-form-item>
+        <div v-for="(item, index) in addQuestionForm.similarityQestions" v-if="index >= 1" :key="index">
+          <el-form-item :label-width="formLabelWidth">
+            <el-input type="text" v-model="addQuestionForm.similarityQestions[index]" autocomplete="off" style="width:500px"></el-input>
+            <i class="el-icon-remove-outline" style="font-size: 20px" @click="deleteSimiliartyQeustion(index, item)"></i>
+          </el-form-item>
+        </div>
+        <el-form-item label="标准答案" :label-width="formLabelWidth"  prop="answer">
+          <quill-editor
+              class="ql-editor"
+              ref="myTextEditor"
+              style="width:500px;"
+              :options="quillOption"
+              v-model="addQuestionForm.answer"
+            ></quill-editor>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click='saveQuestionAndAnswer("addQuestionForm")'>确 定</el-button>
+      </div>
+    </el-dialog>
   </el-container>
   </div>
 </template>
@@ -74,40 +86,65 @@
 </style>
 
 <script>
+import {getCategoryList} from '../../api/customerKb.js'
+import { Quill, quillEditor } from 'vue-quill-editor'
+import quillConfig from '../../components/common/quill-config'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 export default {
   data() {
-    const item = {
-      date: "2016-05-02",
-      name: "王小虎",
-      address: "上海市普陀区金沙江路 1518 弄",
-    };
     return {
-      tableData: Array(20).fill(item),
+      questionList: [],
+      navList: [],
+      addQuestionForm: {
+        question: '',
+        similarityQestions: [''],
+        answer: '',
+        relationQeustions: []
+      },
+      dialogFormVisible: false,
+      formLabelWidth: '100px',
+      editor: null, // 富文本编辑器对象
+      editorOption: { //  富文本编辑器配置
+        placeholder: '请输入',
+        theme: 'snow', // or 'bubble'
+        modules: {
+          toolbar: {
+            container: '#toolbar'
+          }
+        }
+      },
+      content: '<h2>hello quill-editor</h2>',
+      quillOption: quillConfig
     };
   },
-  mounted: function () {},
+   mounted: function () {
+    this.getCategoryDataList(1);
+  },
   methods: {
-    batchOperate(command) {
-      switch (command) {
-        case "batch_remarks":
-          this.dialogRemarks();
-          break;
-        case "export_excel":
-          this.exportExcel();
-          break;
-      }
+    getCategoryDataList(categoryId){
+      getCategoryList(categoryId).then(res => {
+        this.navList = res.data
+      }).catch(err => {
+          this.$message({
+            type: 'error',
+            message: '拉取分类列表失败'
+          });  
+      })
     },
-    // 导出本页Excel表
-    exportExcel() {
-      console.log(111);
+    addSimiliartyQuestion(){
+      this.addQuestionForm.similarityQestions.push('')
     },
-    dialogRemarks() {
-      console.log(222);
+    deleteSimiliartyQeustion(index, item){
+      this.addQuestionForm.similarityQestions.splice(index, 1)
     },
-    //打开的index
-    select(index){
-      console.log(index)
+    saveQuestionAndAnswer(addQuestionForm){
+      
     }
   },
+  components: {
+    quillEditor
+  }
 };
 </script>

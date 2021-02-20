@@ -8,6 +8,7 @@ import lombok.Getter;
  * @Date: 2020/12/13 23:45
  */
 public enum  ErrorCodeEnum {
+    SUCCESS(1001, "成功"),
     SYSTEM_ERROR(1008, "系统异常"),
     BUSINESS_ERROR(1005, "业务异常");
 

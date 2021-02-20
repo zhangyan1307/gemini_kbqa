@@ -3,6 +3,7 @@ import NotFound from "@/pages/NotFound";
 import CustomerKb from "@/pages/CustomerKb";
 import RobotKbAdmin from "@/pages/RobotKbAdmin";
 import Login from "@/pages/Login/Login";
+import RobotTest from "@/pages/RobotTest";
 const routerConfig = [
   {
     path: "/",
@@ -21,6 +22,17 @@ const routerConfig = [
         component: RobotKbAdmin,
       },
       { path: "/kbqaAdmin/customerKb", component: CustomerKb },
+    ],
+  },
+  {
+    path: "/kbqaBot",
+    component: HeaderAsideLayout,
+    children: [
+      {
+        path: "/kbqaBot/kbqaBotTest",
+        component: RobotTest,
+      },
+      { path: "/kbqaBot/kbqaBotTest", component: RobotTest },
     ],
   },
   {

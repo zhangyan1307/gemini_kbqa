@@ -7,6 +7,11 @@ import App from './App.vue';
 import router from './router';
 
 Vue.use(ElementUI);
+import Chat from 'jwchat';
+/* 在 0.2.041 之前的版本需要引入 css */
+// import 'jwchat/lib/JwChat.css';
+Vue.use(Chat);
+
 
 Vue.config.productionTip = false;
 

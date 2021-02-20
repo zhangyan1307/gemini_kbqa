@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class CustomerKbClient {
-    @Reference
-    private CustomerKbFacade customerKbFacade;
+    /*@Reference
+    private CustomerKbFacade customerKbFacade;*/
 
 
 }
