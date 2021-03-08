@@ -34,9 +34,18 @@
               <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="deleteQuestion(row.id)">
                 删除
               </el-button>
-          </template>
+            </template>
           </el-table-column>
         </el-table>
+         <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[10, 20, 30, 50, 100]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="questionList.length">
+      </el-pagination>
       </el-main>
     </el-container>
     <el-dialog title="新增知识规则" :visible.sync="dialogFormVisible">
@@ -45,12 +54,12 @@
           <el-input type="text" v-model="addQuestionForm.question" autocomplete="off" style="width:500px"></el-input>
         </el-form-item>
         <el-form-item label="相似问题" :label-width="formLabelWidth" prop="similarityQestions[0]">
-          <el-input type="text" v-model="addQuestionForm.similarityQestions[0]" autocomplete="off" style="width:500px"></el-input>
+          <el-input type="text" v-model="addQuestionForm.similarityQuestions[0]" autocomplete="off" style="width:500px"></el-input>
           <i class="el-icon-circle-plus-outline" style="font-size: 20px" @click="addSimiliartyQuestion()"></i>
         </el-form-item>
-        <div v-for="(item, index) in addQuestionForm.similarityQestions" v-if="index >= 1" :key="index">
+        <div v-for="(item, index) in addQuestionForm.similarityQuestions" v-if="index >= 1" :key="index">
           <el-form-item :label-width="formLabelWidth">
-            <el-input type="text" v-model="addQuestionForm.similarityQestions[index]" autocomplete="off" style="width:500px"></el-input>
+            <el-input type="text" v-model="addQuestionForm.similarityQuestions[index]" autocomplete="off" style="width:500px"></el-input>
             <i class="el-icon-remove-outline" style="font-size: 20px" @click="deleteSimiliartyQeustion(index, item)"></i>
           </el-form-item>
         </div>
@@ -66,7 +75,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click='saveQuestionAndAnswer("addQuestionForm")'>确 定</el-button>
+        <el-button type="primary" @click='saveQuestionAndAnswer()'>确 定</el-button>
       </div>
     </el-dialog>
   </el-container>
@@ -86,7 +95,7 @@
 </style>
 
 <script>
-import {getCategoryList} from '../../api/customerKb.js'
+import {getCategoryList, saveQuestion, getQuestionListPageByCategoryId, deleteQuestion} from '../../api/customerKb.js'
 import { Quill, quillEditor } from 'vue-quill-editor'
 import quillConfig from '../../components/common/quill-config'
 import 'quill/dist/quill.core.css'
@@ -99,10 +108,12 @@ export default {
       navList: [],
       addQuestionForm: {
         question: '',
-        similarityQestions: [''],
+        similarityQuestions: [''],
         answer: '',
-        relationQeustions: []
+        relationQuestions: [],
+        categoryId: ''
       },
+      selectCategoryId: '',
       dialogFormVisible: false,
       formLabelWidth: '100px',
       editor: null, // 富文本编辑器对象
@@ -116,11 +127,13 @@ export default {
         }
       },
       content: '<h2>hello quill-editor</h2>',
-      quillOption: quillConfig
+      quillOption: quillConfig,
+      pageNum:1,
+      pageSize:10
     };
   },
    mounted: function () {
-    this.getCategoryDataList(1);
+    this.getCategoryDataList(1)
   },
   methods: {
     getCategoryDataList(categoryId){
@@ -139,9 +152,51 @@ export default {
     deleteSimiliartyQeustion(index, item){
       this.addQuestionForm.similarityQestions.splice(index, 1)
     },
-    saveQuestionAndAnswer(addQuestionForm){
-      
-    }
+    saveQuestionAndAnswer(){
+      this.addQuestionForm.categoryId = this.selectCategoryId
+      saveQuestion(this.addQuestionForm).then(res => {
+        this.$message({
+            message: '新增成功',
+            type: 'success'
+         })
+         this.$refs['addQuestionForm'].resetFields()
+         this.dialogFormVisible = false
+         this.getDataList(this.selectCategoryId, this.pageNum, this.pageSize)
+      })
+    },
+    deleteQuestion(id){
+      deleteQuestion(id).then(res => {
+        this.$message({
+            message: '删除成功',
+            type: 'success'
+         })
+         this.getDataList(this.selectCategoryId, this.pageNum, this.pageSize)
+      })
+    },
+    getDataList(categoryId, pageNum, pageSize){
+      this.selectCategoryId = categoryId
+      let data = {
+        categoryId:categoryId,
+        pageNum:pageNum,
+        pageSize:pageSize
+      }
+      getQuestionListPageByCategoryId(data).then(res => {
+        this.questionList = res.data.data
+      }).catch(err => {
+        this.$message({
+            message: '获取问答列表失败',
+            type: 'error'
+         })
+      })
+    },
+      // 每页多少条
+      handleSizeChange(val) {
+          this.pageSize = val;
+      },
+      // 当前页
+      handleCurrentChange(val) {
+          this.currentPage = val;
+      }
   },
   components: {
     quillEditor

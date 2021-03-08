@@ -30,7 +30,7 @@
           <el-button type="primary" size="mini">
             编辑
           </el-button>
-          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="deleteArticle(row.id)">
+          <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="deleteArticle(row.id, row.articleContent)">
             删除
           </el-button>
         </template>
@@ -128,7 +128,7 @@
 </style>
     
 <script>
-import {getCategoryList,saveCategory,getArticleByCategoryId} from '../../api/customerKb.js'
+import {getCategoryList,saveCategory,getArticleByCategoryId, deleteArticle} from '../../api/customerKb.js'
 export default {
   data() {
     return {
@@ -203,8 +203,19 @@ export default {
       })
     },
     
-    deleteArticle(id){
-      alert(id)
+    deleteArticle(id, articleContent){
+      let data = {
+        articleId:id,
+        fileId:articleContent
+      }
+      deleteArticle(data).then(res => {
+        this.getDataList(this.selectCategoryId, this.pageNum, this.pageSize)
+      }).catch(err => {
+        this.$message({
+            message: '删除文章失败',
+            type: 'error'
+         })
+      })
     },
 
     getDataList(categoryId, pageNum, pageSize){
