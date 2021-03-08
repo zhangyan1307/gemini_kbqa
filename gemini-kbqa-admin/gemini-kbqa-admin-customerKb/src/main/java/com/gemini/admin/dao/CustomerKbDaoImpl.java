@@ -75,7 +75,7 @@ public class CustomerKbDaoImpl {
         }
     }
 
-    public void deleteKbCustomerArticle(Integer id){
+    public void deleteKbCustomerArticle(Long id){
         Integer row = kbCustomerArticleMapper.deleteById(id);
         if(row == 0){
             log.warn("删除文档失败:{}", id);

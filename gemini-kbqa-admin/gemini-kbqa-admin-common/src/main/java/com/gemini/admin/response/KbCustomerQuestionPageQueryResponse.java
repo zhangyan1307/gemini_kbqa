@@ -18,6 +18,8 @@ public class KbCustomerQuestionPageQueryResponse {
 
     private Integer categoryId;
 
+    private Integer recommendFlag;
+
     private List<KbCustomerSimilarityQuestionQueryResponse> similarityQuestionQueryResponses;
 
     private List<KbCustomerRelationQuestionQueryResponse> relationQuestionQueryResponses;

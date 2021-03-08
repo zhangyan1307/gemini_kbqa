@@ -20,7 +20,13 @@ public class KbCustomerQuestionAddRequest {
 
     private Integer categoryId;
 
+    private Integer recommendFlag;
+
     private List<KbCustomerSimilarityQuestionAddRequest> similarityQuestionAddRequests;
 
     private List<KbCustomerRelationQuestAddRequest> relationQuestAddRequests;
+
+    private List<String> relationQuestions;
+
+    private List<String> similarityQuestions;
 }

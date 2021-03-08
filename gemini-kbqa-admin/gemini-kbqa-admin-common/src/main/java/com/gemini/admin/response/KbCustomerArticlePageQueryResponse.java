@@ -8,7 +8,7 @@ import lombok.EqualsAndHashCode;
  * @Date: 2021/2/1 23:26
  */
 @Data
-public class KbCustomerArticlePageQueryResponse{
+public class KbCustomerArticlePageQueryResponse {
 
     private Long id;
 

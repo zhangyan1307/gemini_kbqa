@@ -32,14 +32,14 @@ public class CustomerKbController {
 
     @PostMapping("/saveCustomerCategory")
     @ApiOperation(value = "添加客服知识库分类")
-    public Response<Void> saveCustomerCategory(@RequestBody CustomerKbCategoryAddRequest request){
+    public Response<Void> saveCustomerCategory(@RequestBody CustomerKbCategoryAddRequest request) {
         customerKbService.addCustomerKbCategory(request);
         return Response.ok();
     }
 
     @DeleteMapping("/removeCustomerCategory")
     @ApiOperation(value = "删除客服知识库分类")
-    public Response<Void> removeCustomerCategory(@ApiParam("分类id") Integer categoryId){
+    public Response<Void> removeCustomerCategory(@ApiParam("分类id") Integer categoryId) {
         customerKbService.removeCustomerKbCategory(categoryId);
         return Response.ok();
     }

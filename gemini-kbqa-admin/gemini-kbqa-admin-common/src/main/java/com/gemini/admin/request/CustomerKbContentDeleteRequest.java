@@ -9,5 +9,14 @@ import lombok.Data;
  */
 @Data
 public class CustomerKbContentDeleteRequest {
+
+    /**
+     * 文章id
+     */
     private Long articleId;
+
+    /**
+     * 文件id
+     */
+    private String fileId;
 }

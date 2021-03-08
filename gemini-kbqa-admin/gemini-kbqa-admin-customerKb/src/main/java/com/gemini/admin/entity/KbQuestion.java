@@ -28,4 +28,9 @@ public class KbQuestion extends BaseEntity {
      * 分类id
      */
     private Integer categoryId;
+
+    /**
+     * 是否是推荐问题
+     */
+    private Integer recommendFlag;
 }

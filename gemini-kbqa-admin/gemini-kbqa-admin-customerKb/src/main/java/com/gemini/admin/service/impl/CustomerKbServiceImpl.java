@@ -80,7 +80,7 @@ public class CustomerKbServiceImpl implements CustomerKbService {
 
     @Override
     public void deleteCustomerKbContent(CustomerKbContentDeleteRequest request) {
-
+        customerKbDao.deleteKbCustomerArticle(request.getArticleId());
     }
 
     @Override

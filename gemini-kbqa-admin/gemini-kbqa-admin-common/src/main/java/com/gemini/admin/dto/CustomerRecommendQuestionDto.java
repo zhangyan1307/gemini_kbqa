@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @Date: 2021/3/4 7:36
  */
 @Data
-public class CustomerQuestionDto implements Serializable {
+public class CustomerRecommendQuestionDto implements Serializable {
     /**
      * id
      */

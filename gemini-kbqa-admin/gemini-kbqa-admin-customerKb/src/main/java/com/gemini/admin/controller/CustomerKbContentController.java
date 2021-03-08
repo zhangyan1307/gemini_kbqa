@@ -2,6 +2,7 @@ package com.gemini.admin.controller;
 
 import com.gemini.admin.busiEnum.ArticleTypeEnum;
 import com.gemini.admin.request.CustomerKbContentAddRequest;
+import com.gemini.admin.request.CustomerKbContentDeleteRequest;
 import com.gemini.admin.request.CustomerKbContentPageQueryRequest;
 import com.gemini.admin.response.CommonPageResponse;
 import com.gemini.admin.response.KbCustomerArticlePageQueryResponse;
@@ -12,8 +13,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -37,18 +41,18 @@ import java.util.Map;
 @Slf4j
 public class CustomerKbContentController {
 
-    //获得SpringBoot提供的mongodb的GridFS对象
+    // 获得SpringBoot提供的mongodb的GridFS对象
     private final GridFsTemplate gridFsTemplate;
 
     private final CustomerKbService customerKbService;
 
     @PostMapping(value = "/file/upload")
     @ApiOperation("上传文档")
-    public Response<Void> uploadFile(HttpServletRequest request){
+    public Response<Void> uploadFile(HttpServletRequest request) {
         try {
             Part file = request.getPart("file");
             String fileId = null;
-            if(file != null){
+            if (file != null) {
                 // 获得提交的文件名
                 String fileName = file.getSubmittedFileName();
                 // 获得文件输入流
@@ -72,7 +76,7 @@ public class CustomerKbContentController {
             contentAddRequest.setArticleTitle(articleTitle);
             contentAddRequest.setArticleType(ArticleTypeEnum.FILE.getType());
             customerKbService.addCustomerKbContent(contentAddRequest);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("添加客服内部知识失败");
             Response.fail();
         }
@@ -81,7 +85,18 @@ public class CustomerKbContentController {
 
     @GetMapping("/queryCustomerContentByCategoryId")
     @ApiOperation("通过分类查询知识文档")
-    public Response<CommonPageResponse<KbCustomerArticlePageQueryResponse>> queryCustomerContentListByCategoryId(CustomerKbContentPageQueryRequest request){
-       return Response.ok(customerKbService.queryCustomerKbContentByCategoryId(request));
+    public Response<CommonPageResponse<KbCustomerArticlePageQueryResponse>>
+        queryCustomerContentListByCategoryId(CustomerKbContentPageQueryRequest request) {
+        return Response.ok(customerKbService.queryCustomerKbContentByCategoryId(request));
+    }
+
+    @GetMapping("/deleteCustomerContent")
+    @ApiOperation("删除知识文档")
+    public Response<Void> deleteCustomerContent(CustomerKbContentDeleteRequest request) {
+        if (StringUtils.isNotEmpty(request.getFileId())) {
+            gridFsTemplate.delete(Query.query(Criteria.where("_id").is(request.getFileId())));
+        }
+        customerKbService.deleteCustomerKbContent(request);
+        return Response.ok();
     }
 }

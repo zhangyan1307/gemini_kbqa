@@ -49,11 +49,12 @@ public class CustomerKbQuestionDaoImpl {
      * 保存标准问答
      * @param question
      */
-    public void saveKbQuestion(KbQuestion question){
+    public Long saveKbQuestion(KbQuestion question){
         Integer row = kbCustomerQuestionMapper.insert(question);
         if(row == 0){
             log.warn("插入标准问答失败,{}", question);
         }
+        return question.getId();
     }
 
     public void deleteKbQuestion(Long questionId){
@@ -135,5 +136,11 @@ public class CustomerKbQuestionDaoImpl {
         if(row == 0){
             log.warn("删除关联问失败:{}", id);
         }
+    }
+
+    public List<KbQuestion> selectRecommendQuestions(){
+        QueryWrapper<KbQuestion> wrapper = new QueryWrapper<>();
+        wrapper.eq("recommend_flag", 1);
+        return kbCustomerQuestionMapper.selectList(wrapper);
     }
 }
