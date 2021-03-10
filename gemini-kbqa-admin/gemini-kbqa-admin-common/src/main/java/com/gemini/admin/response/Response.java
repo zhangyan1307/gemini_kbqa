@@ -38,4 +38,7 @@ public class Response<T> {
     public static <T> Response<T> fail(){
         return new Response<>(ErrorCodeEnum.SYSTEM_ERROR.getCode(), ErrorCodeEnum.SYSTEM_ERROR.getDesc());
     }
+    public static <T> Response<T> fail(String desc){
+        return new Response<>(ErrorCodeEnum.SYSTEM_ERROR.getCode(), desc);
+    }
 }

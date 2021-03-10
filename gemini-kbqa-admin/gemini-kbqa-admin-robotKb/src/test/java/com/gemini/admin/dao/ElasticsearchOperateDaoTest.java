@@ -3,6 +3,21 @@ package com.gemini.admin.dao;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.http.HttpHost;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.common.text.Text;
+import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +28,9 @@ import org.springframework.data.elasticsearch.annotations.Document;
 import org.springframework.data.elasticsearch.core.ElasticsearchRestTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author: XXY
@@ -80,5 +97,90 @@ public class ElasticsearchOperateDaoTest {
         ObjectWriter objectWriter = new ObjectMapper().writer().withDefaultPrettyPrinter();
         String json = objectWriter.writeValueAsString(articles);
         System.out.println(json);
+    }
+
+
+
+    /**
+     * @Author Gu YuLong
+     * @Description ES查询超时时间
+     */
+    public static int SEARCH_TIME_OUT = 60;
+    // 配置文件
+    public static String ES_HOST = "192.168.1.131";
+    public static int ES_PORT = 9200;
+    // 通配符符号
+    public static String WILDCARD = "*";
+
+    /**
+     * @author Gu YuLong
+     * @description 初始化ES客户端
+     * @date 2021/3/9 16:14
+     * @return
+     */
+    public static RestHighLevelClient client = new RestHighLevelClient(
+            RestClient.builder(
+                    new HttpHost(ES_HOST, ES_PORT)
+            )
+    );
+
+
+    //测试查询自定义查询
+    public void queryByQuestion(String val, Integer page, Integer pageSize) throws IOException {
+        BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        builder.must(QueryBuilders.matchPhraseQuery("question", WILDCARD + val + WILDCARD));
+//        builder.must(QueryBuilders.wildcardQuery("question.keyword", WILDCARD + val + WILDCARD));
+        sourceBuilder.query(builder);
+        sourceBuilder.from((page-1)*pageSize);
+        sourceBuilder.size(pageSize);
+        sourceBuilder.timeout(new TimeValue(SEARCH_TIME_OUT, TimeUnit.SECONDS));
+        HighlightBuilder highlightBuilder = new HighlightBuilder().field("question").requireFieldMatch(false);
+        highlightBuilder.preTags("<em style='color:red'>")
+                .postTags("</em>");
+
+        sourceBuilder.highlighter(highlightBuilder);
+
+        SearchRequest searchRequest = new SearchRequest("question");
+        searchRequest.types("qdocument");
+        searchRequest.source(sourceBuilder);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = response.getHits();
+        List list = new ArrayList();
+        for(SearchHit hit: hits){
+            Map<String, Object> map = hit.getSourceAsMap();
+            disposeHighlighter(hit, map);
+            list.add(map);
+        }
+        list.forEach( m ->{
+            System.out.println(m.toString());
+        });
+    }
+
+    @Test
+    public void query() throws IOException {
+        String val = "测试用例";
+        Integer page = 1;
+        Integer pageSize = 10;
+        queryByQuestion(val, page, pageSize);
+    }
+
+
+    public void disposeHighlighter(SearchHit hit, Map<String, Object> source) {
+        Map<String, HighlightField> highlightFields = hit.getHighlightFields();
+        Set<String> ketSet = highlightFields.keySet();
+        for (String element : ketSet) {
+            HighlightField highlightField = highlightFields.get(element);
+            if (highlightField != null) {
+                Text[] fragments = highlightField.fragments();
+                String nameTmp = "";
+                for (Text text : fragments) {
+                    nameTmp += text;
+                }
+                //将高亮片段组装到结果中去
+                source.put(element, nameTmp);
+            }
+
+        }
     }
 }
