@@ -17,6 +17,8 @@
         <module>gemini-kbqa-admin-robotKb</module>
         <module>gemini-kbqa-admin-common</module>
         <module>gemini-kbqa-admin-api</module>
+        <module>gemini-kbqa-admin-report</module>
+        <module>gemini-kbqa-admin-user</module>
     </modules>
     <properties>
         <maven.compile.source>1.8</maven.compile.source>
