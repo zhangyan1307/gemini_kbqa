@@ -80,3 +80,12 @@ export function getQuestionListPageByCategoryId(data) {
     }
   })
 }
+
+export function setRecomendFlag(data) {
+  return request({
+    method: 'post',
+    url:'/api/questionAndAnswer/setRecommendFlag',
+    data
+  })
+  
+}

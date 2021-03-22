@@ -15,6 +15,13 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/robot':{
+        target: 'http://localhost:8889', //API服务器地址
+        changeOrigin: true, 
+        pathRewrite: {
+          '^/robot': ''
+        }
       }
     }
   },

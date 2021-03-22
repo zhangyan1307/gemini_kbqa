@@ -26,12 +26,21 @@
           </el-table-column>
           <el-table-column prop="keyWordCount" label="关键词个数" width="180" align="center">
           </el-table-column>
+          <el-table-column prop="recommendFlag" label="是否为推荐问题" width="180" align="center">
+            <template slot-scope="scope">
+              <span v-if="scope.row.recommendFlag == 1">是</span>
+              <span v-else>否</span>
+            </template>
+          </el-table-column>
           <el-table-column label="操作" align="center">
             <template slot-scope="{row,$index}">
-              <el-button type="primary" size="mini">
-                编辑
+              <el-button type="primary" v-if="row.recommendFlag == 0" size="mini" @click="setRecommendFlag(row.id, 1)">
+                置为推荐问题
               </el-button>
-              <el-button v-if="row.status!='deleted'" size="mini" type="danger" @click="deleteQuestion(row.id)">
+              <el-button type="success" v-if="row.recommendFlag == 1" size="mini" @click="setRecommendFlag(row.id, 0)">
+                置为普通问题
+              </el-button>
+              <el-button v-if="row.status!='DELETED'" size="mini" type="danger" @click="deleteQuestion(row.id)">
                 删除
               </el-button>
             </template>
@@ -51,26 +60,27 @@
     <el-dialog title="新增知识规则" :visible.sync="dialogFormVisible">
       <el-form ref="addQuestionForm" :model="addQuestionForm">
         <el-form-item label="标准问题" :label-width="formLabelWidth" prop="question">
-          <el-input type="text" v-model="addQuestionForm.question" autocomplete="off" style="width:500px"></el-input>
+          <el-input type="text" v-model="addQuestionForm.question" autocomplete="off" ></el-input>
         </el-form-item>
         <el-form-item label="相似问题" :label-width="formLabelWidth" prop="similarityQestions[0]">
-          <el-input type="text" v-model="addQuestionForm.similarityQuestions[0]" autocomplete="off" style="width:500px"></el-input>
+          <el-input type="text" v-model="addQuestionForm.similarityQuestions[0]" autocomplete="off" ></el-input>
           <i class="el-icon-circle-plus-outline" style="font-size: 20px" @click="addSimiliartyQuestion()"></i>
         </el-form-item>
         <div v-for="(item, index) in addQuestionForm.similarityQuestions" v-if="index >= 1" :key="index">
           <el-form-item :label-width="formLabelWidth">
-            <el-input type="text" v-model="addQuestionForm.similarityQuestions[index]" autocomplete="off" style="width:500px"></el-input>
+            <el-input type="text" v-model="addQuestionForm.similarityQuestions[index]" autocomplete="off"></el-input>
             <i class="el-icon-remove-outline" style="font-size: 20px" @click="deleteSimiliartyQeustion(index, item)"></i>
           </el-form-item>
         </div>
         <el-form-item label="标准答案" :label-width="formLabelWidth"  prop="answer">
-          <quill-editor
+          <!-- <quill-editor
               class="ql-editor"
               ref="myTextEditor"
               style="width:500px;"
               :options="quillOption"
               v-model="addQuestionForm.answer"
-            ></quill-editor>
+            ></quill-editor> -->
+            <el-input type="text" v-model="addQuestionForm.answer" style="with:500px"></el-input>
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -95,7 +105,7 @@
 </style>
 
 <script>
-import {getCategoryList, saveQuestion, getQuestionListPageByCategoryId, deleteQuestion} from '../../api/customerKb.js'
+import {getCategoryList, saveQuestion, getQuestionListPageByCategoryId, deleteQuestion, setRecomendFlag} from '../../api/customerKb.js'
 import { Quill, quillEditor } from 'vue-quill-editor'
 import quillConfig from '../../components/common/quill-config'
 import 'quill/dist/quill.core.css'
@@ -112,6 +122,10 @@ export default {
         answer: '',
         relationQuestions: [],
         categoryId: ''
+      },
+      recommendFlagForm : {
+        questionId: '',
+        recommendFlag: ''
       },
       selectCategoryId: '',
       dialogFormVisible: false,
@@ -147,10 +161,10 @@ export default {
       })
     },
     addSimiliartyQuestion(){
-      this.addQuestionForm.similarityQestions.push('')
+      this.addQuestionForm.similarityQuestions.push('')
     },
     deleteSimiliartyQeustion(index, item){
-      this.addQuestionForm.similarityQestions.splice(index, 1)
+      this.addQuestionForm.similarityQuestions.splice(index, 1)
     },
     saveQuestionAndAnswer(){
       this.addQuestionForm.categoryId = this.selectCategoryId
@@ -189,6 +203,25 @@ export default {
          })
       })
     },
+    setRecommendFlag(id, recommendFlag){
+      let data = {
+        questionId: id,
+        recommendFlag: recommendFlag
+      }
+      setRecomendFlag(data).then(res => {
+        this.$message({
+          message: '操作成功',
+          type: 'success'
+        })
+        this.getDataList(this.selectCategoryId, this.pageNum, this.pageSize)
+      }).catch(err => {
+        this.$message({
+          message:'操作失败',
+          type: 'error'
+        })
+      })
+    },
+    
       // 每页多少条
       handleSizeChange(val) {
           this.pageSize = val;
