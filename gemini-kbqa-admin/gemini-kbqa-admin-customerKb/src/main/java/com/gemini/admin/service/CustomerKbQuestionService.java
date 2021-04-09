@@ -6,10 +6,7 @@ import com.gemini.admin.dto.CustomerRecommendQuestionDto;
 import com.gemini.admin.entity.KbQuestion;
 import com.gemini.admin.entity.KbRelationQuestion;
 import com.gemini.admin.entity.KbSimilarityQuestion;
-import com.gemini.admin.request.KbCustomerQuestionAddRequest;
-import com.gemini.admin.request.KbCustomerQuestionPageQueryRequest;
-import com.gemini.admin.request.KbCustomerRelationQuestAddRequest;
-import com.gemini.admin.request.KbCustomerSimilarityQuestionAddRequest;
+import com.gemini.admin.request.*;
 import com.gemini.admin.response.CommonPageResponse;
 import com.gemini.admin.response.KbCustomerQuestionPageQueryResponse;
 import com.gemini.admin.response.KbCustomerRelationQuestionQueryResponse;
@@ -68,6 +65,8 @@ public interface CustomerKbQuestionService {
      * @return
      */
     List<CustomerRecommendQuestionDto> queryRecommendQuestions();
+
+    void setRecommendFlag(KbSetRecommendRequest setRecommendRequest);
 
     default CommonPageResponse<KbCustomerQuestionPageQueryResponse> buildQuestionDaoToResponse(IPage<KbQuestion> page,
         CustomerKbQuestionDaoImpl customerKbQuestionDao) {

@@ -77,4 +77,17 @@ public class CustomerKbQuestionController {
             return Response.fail();
         }
     }
+
+    @PostMapping("/setRecommendFlag")
+    @ApiOperation("设置为推荐问")
+    public Response<Void> setRecommendFlag(@RequestBody KbSetRecommendRequest recommendRequest){
+
+        try {
+            customerKbQuestionService.setRecommendFlag(recommendRequest);
+            return Response.ok();
+        } catch (Exception e) {
+            return Response.fail();
+        }
+
+    }
 }

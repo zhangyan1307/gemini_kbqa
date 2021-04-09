@@ -2,10 +2,14 @@ package com.gemini.admin.service.impl; /**
  * Copyright (c) 2021,CHENGJIINFORMATION TECHNOLOGY(SHANGHAI) O.,LTD  All Rights Reserved.
  */
 
+import com.gemini.admin.client.CustomerKbClient;
+import com.gemini.admin.dto.CustomerRecommendQuestionDto;
+import com.gemini.admin.request.KbCustomerRecommendQuestionQueryResponse;
 import com.gemini.admin.response.Response;
 import com.gemini.admin.service.InputAdviceService;
 import com.gemini.admin.util.EsUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,6 +30,9 @@ public class InputAdviceServiceImpl implements InputAdviceService {
     // 定义默认查询条数
     private static final Integer PAGE_NO = 1;
     private static final Integer PAGE_SIZE = 1000;
+
+    @Autowired
+    private CustomerKbClient customerKbClient;
 
     /**
      * @author Gu YuLong
@@ -48,5 +55,11 @@ public class InputAdviceServiceImpl implements InputAdviceService {
             log.info("未从es查到符合关键字{}的数据", keyword);
         }
         return Response.ok(mapList);
+    }
+
+    @Override
+    public List<KbCustomerRecommendQuestionQueryResponse> queryRecommendQuestions() {
+        List<CustomerRecommendQuestionDto> wantAskQuestions = customerKbClient.getWantAskQuestions();
+        return buildRecommendDtoToResponse(wantAskQuestions);
     }
 }

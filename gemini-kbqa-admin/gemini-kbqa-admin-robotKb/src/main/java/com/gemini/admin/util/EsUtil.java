@@ -40,7 +40,7 @@ public class EsUtil {
      */
     public static int SEARCH_TIME_OUT = 60;
     // 配置文件
-    public static String ES_HOST = "192.168.1.131";
+    public static String ES_HOST = "129.211.159.145";
     public static int ES_PORT = 9200;
     // 通配符符号
     public static String WILDCARD = "*";
@@ -75,11 +75,11 @@ public class EsUtil {
         sourceBuilder.from((page-1)*pageSize);
         sourceBuilder.size(pageSize);
         sourceBuilder.timeout(new TimeValue(SEARCH_TIME_OUT, TimeUnit.SECONDS));
-        HighlightBuilder highlightBuilder = new HighlightBuilder().field("question").requireFieldMatch(false);
+       /* HighlightBuilder highlightBuilder = new HighlightBuilder().field("question").requireFieldMatch(false);
         highlightBuilder.preTags("<em style='color:red'>")
                 .postTags("</em>");
 
-        sourceBuilder.highlighter(highlightBuilder);
+        sourceBuilder.highlighter(highlightBuilder);*/
 
         SearchRequest searchRequest = new SearchRequest("question");
         searchRequest.types("qdocument");
@@ -89,7 +89,7 @@ public class EsUtil {
         List<Map<String, Object>> list = new ArrayList();
         for(SearchHit hit: hits){
             Map<String, Object> map = hit.getSourceAsMap();
-            disposeHighlighter(hit, map);
+            //disposeHighlighter(hit, map);
             list.add(map);
         }
         return list;
@@ -110,12 +110,12 @@ public class EsUtil {
             HighlightField highlightField = highlightFields.get(element);
             if (highlightField != null) {
                 Text[] fragments = highlightField.fragments();
-                String nameTmp = "";
+                StringBuilder nameTmp = new StringBuilder();
                 for (Text text : fragments) {
-                    nameTmp += text;
+                    nameTmp.append(text);
                 }
                 //将高亮片段组装到结果中去
-                source.put(element, nameTmp);
+                source.put(element, nameTmp.toString());
             }
 
         }

@@ -1,6 +1,7 @@
 package com.gemini.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.gemini.admin.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +12,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_customer_article")
-public class KbCustomerArticle extends BaseEntity{
+public class KbCustomerArticle extends BaseEntity {
 
     private Long id;
 

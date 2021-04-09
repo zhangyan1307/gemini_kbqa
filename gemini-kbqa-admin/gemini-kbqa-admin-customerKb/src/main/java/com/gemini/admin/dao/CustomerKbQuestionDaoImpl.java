@@ -143,4 +143,5 @@ public class CustomerKbQuestionDaoImpl {
         wrapper.eq("recommend_flag", 1);
         return kbCustomerQuestionMapper.selectList(wrapper);
     }
+
 }

@@ -3,6 +3,7 @@ package com.gemini.admin.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.gemini.admin.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +14,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("t_kb_category")
-public class KbCategory extends BaseEntity{
+public class KbCategory extends BaseEntity {
     /**
      * 分类id
      */

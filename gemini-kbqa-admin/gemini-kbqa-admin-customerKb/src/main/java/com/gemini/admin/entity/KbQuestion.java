@@ -1,6 +1,7 @@
 package com.gemini.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.gemini.admin.common.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,4 +34,9 @@ public class KbQuestion extends BaseEntity {
      * 是否是推荐问题
      */
     private Integer recommendFlag;
+
+    /**
+     * 问题状态 删除，正常
+     */
+    private String status;
 }

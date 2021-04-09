@@ -2,6 +2,7 @@ package com.gemini.admin.service.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.gemini.admin.dao.CustomerKbQuestionDaoImpl;
+import com.gemini.admin.dao.mapper.KbCustomerQuestionMapper;
 import com.gemini.admin.dto.CustomerRecommendQuestionDto;
 import com.gemini.admin.entity.KbQuestion;
 import com.gemini.admin.entity.KbSimilarityQuestion;
@@ -9,6 +10,7 @@ import com.gemini.admin.exception.BusinessException;
 import com.gemini.admin.request.KbCustomerQuestionAddRequest;
 import com.gemini.admin.request.KbCustomerQuestionPageQueryRequest;
 import com.gemini.admin.request.KbCustomerSimilarityQuestionAddRequest;
+import com.gemini.admin.request.KbSetRecommendRequest;
 import com.gemini.admin.response.CommonPageResponse;
 import com.gemini.admin.response.KbCustomerQuestionPageQueryResponse;
 import com.gemini.admin.service.CustomerKbQuestionService;
@@ -30,6 +32,8 @@ public class CustomerKbQuestionServiceImpl implements CustomerKbQuestionService 
 
     private final CustomerKbQuestionDaoImpl customerKbQuestionDao;
 
+    private final KbCustomerQuestionMapper kbCustomerQuestionMapper;
+    
     @Override
     public CommonPageResponse<KbCustomerQuestionPageQueryResponse>
         queryCustomerKbQuestionByPage(KbCustomerQuestionPageQueryRequest request) {
@@ -93,5 +97,12 @@ public class CustomerKbQuestionServiceImpl implements CustomerKbQuestionService 
     @Override
     public List<CustomerRecommendQuestionDto> queryRecommendQuestions() {
         return buildKbQuestionsToCustomerQuestionsDto(customerKbQuestionDao.selectRecommendQuestions());
+    }
+
+    @Override
+    public void setRecommendFlag(KbSetRecommendRequest setRecommendRequest) {
+        KbQuestion kbQuestion = kbCustomerQuestionMapper.selectById(setRecommendRequest.getQuestionId());
+        kbQuestion.setRecommendFlag(setRecommendRequest.getRecommendFlag());
+        kbCustomerQuestionMapper.updateById(kbQuestion);
     }
 }

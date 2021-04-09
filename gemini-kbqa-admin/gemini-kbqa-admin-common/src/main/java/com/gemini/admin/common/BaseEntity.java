@@ -1,4 +1,4 @@
-package com.gemini.admin.entity;
+package com.gemini.admin.common;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
